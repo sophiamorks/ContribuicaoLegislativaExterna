@@ -1,6 +1,4 @@
-# Pasta de fotos
-
-## Onde colocar cada imagem
+![image alt]([image_](https://github.com/sophiamorks/ContribuicaoLegislativaExterna/blob/40116ff1e329280bfcf6f6191fbdc9600277d6cd/foto_sophia.jpeg)
 
 - Liderança:
   - `fotos/lideranca/sophia.jpeg`
