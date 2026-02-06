@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contribuição Federal</title>
+  <style>
+    :root{
+      --azul:#0b2f6b;
+      --azul2:#0f4aa2;
+      --cinza:#f3f5f8;
+      --texto:#102033;
+      --borda:#e6e9ef;
+    }
+    body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--cinza);color:var(--texto);}
+    header{background:var(--azul);color:#fff;padding:15px 20px;}
+    header h1{margin:0;font-size:20px;}
+    nav{background:#fff;border-bottom:1px solid var(--borda);padding:10px 18px;display:flex;gap:10px;flex-wrap:wrap}
+    nav a{color:var(--azul2);text-decoration:none;font-weight:700;padding:8px 10px;border-radius:8px}
+    nav a:hover{background:#eef4ff}
+    .wrap{max-width:1100px;margin:20px auto;padding:0 16px;}
+    .card{background:#fff;border:1px solid var(--borda);border-radius:14px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,.05);margin-bottom:14px}
+    h2{margin:0 0 10px;color:var(--azul)}
+    table{width:100%;border-collapse:collapse;margin-top:12px;background:#fff;border:1px solid var(--borda);border-radius:12px;overflow:hidden}
+    th,td{padding:10px;border-bottom:1px solid var(--borda);text-align:left}
+    th{background:#eef4ff;color:var(--azul)}
+    a{color:var(--azul2);font-weight:800;text-decoration:none}
+    a:hover{text-decoration:underline}
+    .muted{opacity:.75}
+    footer{margin-top:26px;background:#fff;border-top:1px solid var(--borda)}
+    footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:16px}
+    footer a{color:var(--azul2);text-decoration:none;font-weight:700}
+  </style>
+</head>
+<body>
+<header>
+  <h1>Contribuição Federal</h1>
+</header>
+
+<nav>
+  <a href="index.html">Início</a>
+  <a href="calendario.html">Calendário</a>
+  <a href="estudo_local.html">Contribuição Local</a>
+  <a href="estudo_federal.html">Contribuição Federal</a>
+</nav>
+
+<div class="wrap">
+  <div class="card">
+    <h2>Escrita de Pareceres Técnicos, Emendas e Sugestões</h2>
+    <div class="muted">
+      Use este espaço para organizar e registrar a produção técnica (parecer + emenda + sugestão) em âmbito federal.
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Relatórios (Federal)</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Título</th>
+          <th>Esfera</th>
+          <th>Data</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><a href="estudo_federal/relatorio_01.html">Relatório 01 - Contribuição Federal</a></td>
+          <td>União</td>
+          <td>2026-02-01</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <div>© 2026 Nexo Governamental XI de Agosto</div>
+    <div>
+      <a href="index.html">Início</a> ·
+      <a href="calendario.html">Calendário</a> ·
+      <a href="estudo_local.html">Local</a>
+    </div>
+  </div>
+</footer>
+</body>
+</html>
