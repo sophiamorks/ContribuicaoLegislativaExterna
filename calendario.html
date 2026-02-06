@@ -29,6 +29,11 @@
     .controls button:hover{filter:brightness(.95)}
     #monthYear{font-weight:900;font-size:18px;color:var(--azul);}
     .calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:15px;}
+    .weekday{
+      font-weight:900;color:var(--azul);
+      text-align:center;font-size:12px;opacity:.85;
+      padding:6px 0;
+    }
     .day{
       background:#fff;border:1px solid var(--borda);min-height:110px;border-radius:12px;
       padding:10px;position:relative;cursor:pointer;
@@ -40,13 +45,23 @@
       margin-top:6px;padding:6px;border-radius:10px;font-size:12px;
       background:var(--warn);border:1px solid #ffe3a8;
     }
+    .event.fixed{
+      background:#eef4ff;border:1px solid #cfe0ff;
+      font-weight:800;
+    }
     .selected{outline:3px solid rgba(15,74,162,.35)}
     .panel{
       margin-top:18px;background:#fff;border:1px solid var(--borda);border-radius:14px;
       padding:14px;box-shadow:0 2px 10px rgba(0,0,0,.05);
     }
     .panel h2{margin:0 0 10px;color:var(--azul);}
-    .eventItem{padding:10px;border:1px solid var(--borda);border-radius:12px;margin:8px 0;background:var(--ok)}
+    .eventItem{
+      padding:10px;border:1px solid var(--borda);border-radius:12px;
+      margin:8px 0;background:var(--ok)
+    }
+    .eventItem.fixed{
+      background:#eef4ff;
+    }
     .muted{opacity:.75;font-size:13px}
     footer{margin-top:26px;background:#fff;border-top:1px solid var(--borda)}
     footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:16px}
@@ -67,9 +82,9 @@
 
 <div class="wrap">
   <div class="controls">
-    <button id="prevMonth">◀</button>
+    <button id="prevMonth" type="button">◀</button>
     <div id="monthYear"></div>
-    <button id="nextMonth">▶</button>
+    <button id="nextMonth" type="button">▶</button>
   </div>
 
   <div class="calendar" id="calendar"></div>
@@ -78,8 +93,10 @@
     <h2>Eventos do Dia</h2>
     <div class="muted">Clique em um dia no calendário para ver os eventos.</div>
     <div id="eventList"></div>
+
     <div class="muted" style="margin-top:10px">
-      Para adicionar eventos, edite o objeto <b>events</b> dentro deste arquivo (calendario.html).
+      Para adicionar eventos pontuais, edite o objeto <b>events</b> abaixo.
+      A reunião fixa de domingo (18h) já aparece automaticamente.
     </div>
   </div>
 </div>
@@ -96,13 +113,23 @@
 </footer>
 
 <script>
-  // ✅ EVENTOS: edite aqui.
-  // Formato: "AAAA-MM-DD": ["Evento 1", "Evento 2"]
+  /**
+   * EVENTOS PONTUAIS (você cadastra por data)
+   * Formato: "AAAA-MM-DD": ["Evento 1", "Evento 2"]
+   */
   const events = {
-    "2026-02-10": ["Reunião da Secretaria (pauta + divisão de tarefas)"],
+    "2026-02-10": ["Prazo: pauta prévia da semana"],
     "2026-02-18": ["Prazo interno: rascunho de parecer técnico (Local)"],
     "2026-02-25": ["Prazo interno: emendas e sugestões (Federal)"]
   };
+
+  /**
+   * EVENTO FIXO SEMANAL
+   * Domingo (0) às 18h
+   */
+  const weeklyFixedEvents = [
+    { weekday: 0, label: "Reunião da Secretaria — 18h" } // 0 = domingo
+  ];
 
   const calendarEl = document.getElementById("calendar");
   const monthYearEl = document.getElementById("monthYear");
@@ -110,7 +137,7 @@
   const prevBtn = document.getElementById("prevMonth");
   const nextBtn = document.getElementById("nextMonth");
 
-  // ✅ Começa no mês atual (antes estava “preso” em um mês fixo).
+  // Começa no mês atual
   let currentDate = new Date();
 
   function formatDateKey(year, monthIndex, day){
@@ -119,8 +146,47 @@
     return `${year}-${m}-${d}`;
   }
 
+  function makeDateObjFromKey(dateKey){
+    const [y,m,d] = dateKey.split("-").map(Number);
+    return new Date(y, m - 1, d);
+  }
+
+  function getEventsForDate(dateKey){
+    const dateObj = makeDateObjFromKey(dateKey);
+    const weekday = dateObj.getDay();
+
+    const out = [];
+
+    // 1) Eventos fixos semanais
+    weeklyFixedEvents.forEach(e=>{
+      if(e.weekday === weekday){
+        out.push({ text: e.label, fixed: true });
+      }
+    });
+
+    // 2) Eventos pontuais cadastrados
+    (events[dateKey] || []).forEach(t=>{
+      out.push({ text: t, fixed: false });
+    });
+
+    return out;
+  }
+
+  function renderWeekdayHeader(){
+    const labels = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
+    labels.forEach(l=>{
+      const el = document.createElement("div");
+      el.className = "weekday";
+      el.textContent = l;
+      calendarEl.appendChild(el);
+    });
+  }
+
   function renderCalendar(){
     calendarEl.innerHTML = "";
+
+    renderWeekdayHeader();
+
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
 
@@ -132,7 +198,7 @@
     const monthNames = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
     monthYearEl.textContent = `${monthNames[month]} ${year}`;
 
-    // Espaços antes do dia 1
+    // Espaços antes do dia 1 (ajustado por conta do header dos dias da semana)
     for(let i=0;i<startWeekday;i++){
       const blank = document.createElement("div");
       blank.style.opacity = "0";
@@ -141,6 +207,8 @@
 
     for(let day=1; day<=totalDays; day++){
       const dateKey = formatDateKey(year, month, day);
+      const dayEvents = getEventsForDate(dateKey);
+
       const dayEl = document.createElement("div");
       dayEl.className = "day";
       dayEl.dataset.dateKey = dateKey;
@@ -150,17 +218,19 @@
       dateLabel.textContent = day;
       dayEl.appendChild(dateLabel);
 
-      if(events[dateKey]){
-        events[dateKey].slice(0,2).forEach(e=>{
+      // Mostra até 2 eventos no quadrado do dia
+      if(dayEvents.length){
+        dayEvents.slice(0,2).forEach(e=>{
           const ev = document.createElement("div");
-          ev.className="event";
-          ev.textContent = e;
+          ev.className = "event" + (e.fixed ? " fixed" : "");
+          ev.textContent = e.text;
           dayEl.appendChild(ev);
         });
-        if(events[dateKey].length > 2){
+
+        if(dayEvents.length > 2){
           const ev = document.createElement("div");
-          ev.className="event";
-          ev.textContent = `+${events[dateKey].length - 2} evento(s)`;
+          ev.className = "event";
+          ev.textContent = `+${dayEvents.length - 2} evento(s)`;
           dayEl.appendChild(ev);
         }
       }
@@ -177,15 +247,17 @@
 
   function renderEvents(dateKey){
     eventListEl.innerHTML = "";
-    const list = events[dateKey] || [];
+    const list = getEventsForDate(dateKey);
+
     if(list.length === 0){
       eventListEl.innerHTML = `<div class="muted">Sem eventos cadastrados para <b>${dateKey}</b>.</div>`;
       return;
     }
+
     list.forEach(item=>{
       const div = document.createElement("div");
-      div.className = "eventItem";
-      div.textContent = item;
+      div.className = "eventItem" + (item.fixed ? " fixed" : "");
+      div.textContent = item.text;
       eventListEl.appendChild(div);
     });
   }
@@ -194,6 +266,7 @@
     currentDate.setMonth(currentDate.getMonth() - 1);
     renderCalendar();
   });
+
   nextBtn.addEventListener("click", ()=>{
     currentDate.setMonth(currentDate.getMonth() + 1);
     renderCalendar();
